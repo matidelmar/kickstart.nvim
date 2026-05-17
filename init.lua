@@ -928,9 +928,15 @@ require('lazy').setup({
     'catppuccin/nvim',
     name = 'catppuccin',
     priority = 1000,
+    lazy = false,
     config = function()
-      vim.g.catppuccin_flavour = 'mocha'
-      vim.cmd.colorscheme 'catppuccin'
+      -- Use the proper Lua setup instead of global vim.g variables
+      require('catppuccin').setup {
+        flavour = 'mocha',
+      }
+
+      -- EXPLICITLY load the flavor colorscheme to bypass NVIM 0.12's built-in fallback
+      vim.cmd.colorscheme 'catppuccin-mocha'
     end,
   },
 
