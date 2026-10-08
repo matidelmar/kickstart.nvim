@@ -224,6 +224,25 @@ vim.keymap.set('n', '<leader>cf', function()
   vim.notify('Copied to clipboard: ' .. path, vim.log.levels.INFO)
 end, { desc = '[C]opy [F]ile path (relative) to clipboard' })
 
+-- Copy relative file path, line range and the selected text to clipboard
+vim.keymap.set('x', '<leader>cs', function()
+  local path = vim.fn.fnamemodify(vim.fn.expand '%', ':.')
+  if path == '' then
+    vim.notify('No file path to copy', vim.log.levels.WARN)
+    return
+  end
+  local lines = vim.fn.getregion(vim.fn.getpos 'v', vim.fn.getpos '.', { type = vim.fn.mode() })
+  local first, last = vim.fn.line 'v', vim.fn.line '.'
+  if first > last then
+    first, last = last, first
+  end
+  local location = path .. ':' .. first .. (last > first and '-' .. last or '')
+  local text = location .. '\n```' .. vim.bo.filetype .. '\n' .. table.concat(lines, '\n') .. '\n```\n'
+  vim.fn.setreg('+', text)
+  vim.api.nvim_feedkeys(vim.keycode '<Esc>', 'n', false)
+  vim.notify('Copied to clipboard: ' .. location, vim.log.levels.INFO)
+end, { desc = '[C]opy [S]election with file location to clipboard' })
+
 -- Oil
 vim.keymap.set('n', '<leader>-', function()
   require('oil').open_float()
